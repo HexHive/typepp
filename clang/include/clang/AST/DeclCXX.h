@@ -1161,7 +1161,7 @@ public:
   /// which means that the class contains or inherits a virtual function.
   /// VTable: forcibly return true although target object is not polymorphic
   bool isPolymorphic() const {
-    if(getASTContext().getLangOpts().Sanitize.has(SanitizerKind::TypePlus) && llvm::ClPolyClasses)
+    if(getASTContext().getLangOpts().Sanitize.has(SanitizerKind::TypePlus) && llvm::ClWrongPolymorphism && llvm::ClPolyClasses)
       if ((this->isClass() || this->isStruct()) && !this->isStandardLayout() && !data().Polymorphic) {
         return true;
     }

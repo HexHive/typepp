@@ -2777,7 +2777,7 @@ void CodeGenFunction::EmitVTablePtrCheckForCast(QualType T,
     
     return;
   }
-  if(!ClassDecl->isDynamicClass()) {
+  if(!ClassDecl->isDynamicClass() && (!CGM.getLangOpts().Sanitize.has(SanitizerKind::TypePlus) || llvm::ClMissingChecks)) {
     return;
   } 
 

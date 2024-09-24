@@ -1,5 +1,5 @@
 #!/bin/sh
-USERNAME=typeppUSER
+USERNAME=nbadoux
 sudo adduser ${USERNAME}
 sudo usermod -aG sudo ${USERNAME}
 

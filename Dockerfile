@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:experimental
 FROM ubuntu:20.04 AS reference_user
 
-ARG USERNAME=typeppUSER
+ARG USERNAME=nbadoux
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 ARG CHROMIUM=Type++/chromium/
@@ -27,7 +27,7 @@ WORKDIR ${HOME}
 FROM reference_user AS spec_cpu
 RUN sudo apt-get -q update && \
 	DEBIAN_FRONTEND="noninteractive" sudo apt-get install -qq -y p7zip-full p7zip-rar 
-COPY cpu2006-1.2.iso cpu2017-1.1.8.iso /mnt/
+COPY --chown=${USERNAME}:${USERNAME} cpu2006-1.2.iso cpu2017-1.1.8.iso /mnt/
 RUN sudo 7z x -o/mnt/cpu2006 /mnt/cpu2006-1.2.iso && sudo 7z x -o/mnt/cpu2017 /mnt/cpu2017-1.1.8.iso && sudo chown -R ${USERNAME} /mnt && sudo chmod +x -R /mnt/* && cd /mnt/cpu2006 && ./install.sh -f -d ${HOME}/cpu2006 && cd /mnt/cpu2017 && ./install.sh -f -d ${HOME}/cpu2017 && sudo rm -drf /mnt
 
 # Build LLVM
@@ -54,7 +54,7 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
     bash -c "$(curl -fsSL https://gef.blah.cat/sh)" 
 
 ENV PATH="${PATH}:/home/${USERNAME}/.local/bin:/usr/local/bin"
-ENV LLVM_FOLDER=${HOME}/typepp
+ENV LLVM_FOLDER=${HOME}/LLVM-typepp
 ENV TYPESAFETY_VTABLE=${LLVM_FOLDER}/Type++
 ENV ENVIRONMENT_FOLDER=${HOME}
 
@@ -65,15 +65,15 @@ RUN mkdir -p ${LLVM_FOLDER} /tmp/ccache && \
 WORKDIR ${LLVM_FOLDER}
 RUN git clone -b release/13.x --single-branch --depth 1 https://github.com/llvm/llvm-project.git ${LLVM_FOLDER} && rm -drf ${LLVM_FOLDER}/.git 
 RUN rm -drf clang/examples/clang-interpreter/ && sed -i '6d' clang/examples/CMakeLists.txt && cat clang/examples/CMakeLists.txt
-COPY --chown=typeppUSER:typeppUSER Type++/environment_template.sh ${HOME}/environment_patched.sh
+COPY --chown=nbadoux:nbadoux Type++/environment_template.sh ${HOME}/environment_patched.sh
 RUN sudo apt install -qq -y texinfo
-COPY --chown=typeppUSER:typeppUSER Type++/*.patch fetch_repos.sh ${LLVM_FOLDER}
+COPY --chown=nbadoux:nbadoux Type++/*.patch fetch_repos.sh ${LLVM_FOLDER}
 RUN  ${LLVM_FOLDER}/fetch_repos.sh
 ENV CCACHE_DIR=/dockerccache
 RUN --mount=type=cache,target=/dockerccache  sudo chown ${USERNAME}:${USERNAME} ${CCACHE_DIR}
-COPY --chown=typeppUSER:typeppUSER build.sh Makefile ${LLVM_FOLDER}
+COPY --chown=nbadoux:nbadoux build.sh Makefile ${LLVM_FOLDER}
 RUN  --mount=type=cache,target=/dockerccache ${LLVM_FOLDER}/build.sh 
-COPY --chown=typeppUSER:typeppUSER reference/*.sh ${LLVM_FOLDER}
+COPY --chown=nbadoux:nbadoux reference/*.sh ${LLVM_FOLDER}
 RUN  --mount=type=cache,target=/dockerccache ${LLVM_FOLDER}/cxx_build.sh 
 
 CMD zsh
@@ -88,7 +88,7 @@ COPY --chown=${USERNAME}:${USERNAME} Type++/spec_cpu ${TYPESAFETY_VTABLE}/spec_c
 WORKDIR ${TYPESAFETY_VTABLE}/spec_cpu/patch
 RUN ./official_patches.sh
 WORKDIR ${TYPESAFETY_VTABLE}/spec_cpu
-ENV LD_LIBRARY_PATH=~/typepp/libunwind-build/lib
+ENV LD_LIBRARY_PATH=~/LLVM-typepp/libunwind-build/lib
 CMD BASELINE=1 ${TYPESAFETY_VTABLE}/spec_cpu/run_spec_in_docker.sh
 
 # SPEC CPU + REFERENCE + MEMORY
@@ -111,7 +111,7 @@ CMD CFI=1 MEMORY=-m ${TYPESAFETY_VTABLE}/spec_cpu/run_spec_in_docker.sh
 # TYPEPP
 FROM reference AS typepp
 ENV TYPEPP=TRUE
-COPY --chown=${USERNAME}:${USERNAME} cxx*.sh lib*.sh build.sh ${LLVM_FOLDER}/
+COPY --chown=${USERNAME}:${USERNAME} *.sh ${LLVM_FOLDER}/
 COPY --chown=${USERNAME}:${USERNAME} Type++/script/*.py ${TYPESAFETY_VTABLE}/script/
 COPY --chown=${USERNAME}:${USERNAME} libunwind ${LLVM_FOLDER}/libunwind
 COPY --chown=${USERNAME}:${USERNAME} libcxxabi ${LLVM_FOLDER}/libcxxabi
@@ -194,7 +194,7 @@ COPY --chown=${USERNAME}:${USERNAME} Type++/spec_cpu ${TYPESAFETY_VTABLE}/spec_c
 WORKDIR ${TYPESAFETY_VTABLE}/spec_cpu/patch
 RUN ./official_patches.sh
 WORKDIR ${TYPESAFETY_VTABLE}/spec_cpu
-ENV LD_LIBRARY_PATH=~/typepp/libunwind-build/lib
+ENV LD_LIBRARY_PATH=~/LLVM-typepp/libunwind-build/lib
 CMD CFI=1 STATS="-stats" ${TYPESAFETY_VTABLE}/spec_cpu/run_spec_in_docker.sh
 
 
@@ -208,13 +208,13 @@ RUN sudo apt-get -q update && \
     libpci-dev gperf  libjsoncpp1 libjsoncpp-dev libasound2-dev libkrb5-dev
 RUN git clone  https://github.com/jordansissel/xdotool.git && cd xdotool && git checkout edbbb7a8f664ceacbb2cffbe8ee4f5a26b5addc8 && sudo make install && cd .. && rm -drf xdotool
 RUN sudo ln -s /usr/bin/lld-13 /usr/bin/lld && sudo ln -s /usr/bin/lld-13 /usr/bin/ld.lld
-COPY --chown=${USERNAME}:${USERNAME} Type++/chromium/chromium-baseline /home/typeppUSER/chromium/
+COPY --chown=${USERNAME}:${USERNAME} Type++/chromium/chromium-baseline /home/nbadoux/chromium/
 RUN /home/${USERNAME}/chromium/build/install-build-deps.sh
 COPY --chown=${USERNAME}:${USERNAME} ${CHROMIUM}/gclient_cfg ${TYPESAFETY_VTABLE}/chromium/gclient_cfg
 COPY --chown=${USERNAME}:${USERNAME} ${CHROMIUM}/get_deps.sh ${TYPESAFETY_VTABLE}/chromium/get_deps.sh
 WORKDIR ${TYPESAFETY_VTABLE}/chromium
 RUN ./get_deps.sh
-RUN sudo mkdir /dockerccache && sudo chown typeppUSER:typeppUSER /dockerccache 
+RUN sudo mkdir /dockerccache && sudo chown nbadoux:nbadoux /dockerccache 
 ENV VERSION=ref
 
 FROM chromium_normal AS chromium_baseline
@@ -235,13 +235,13 @@ RUN git clone  https://github.com/jordansissel/xdotool.git && cd xdotool && git 
 RUN sudo ln -s /usr/bin/lld-13 /usr/bin/lld && sudo ln -s /usr/bin/lld-13 /usr/bin/ld.lld
 
 FROM chromium_typepp_start AS chromium_typepp_normal
-COPY --chown=${USERNAME}:${USERNAME} Type++/chromium/chromium-typepp /home/typeppUSER/chromium/
+COPY --chown=${USERNAME}:${USERNAME} Type++/chromium/chromium-typepp /home/nbadoux/chromium/
 RUN sudo /home/${USERNAME}/chromium/build/install-build-deps.sh
 COPY --chown=${USERNAME}:${USERNAME} ${CHROMIUM}/gclient_cfg ${TYPESAFETY_VTABLE}/chromium/gclient_cfg
 COPY --chown=${USERNAME}:${USERNAME} ${CHROMIUM}/get_deps.sh ${TYPESAFETY_VTABLE}/chromium/get_deps.sh
 WORKDIR ${TYPESAFETY_VTABLE}/chromium
 RUN ./get_deps.sh
-RUN sudo mkdir /dockerccache && sudo chown typeppUSER:typeppUSER /dockerccache 
+RUN sudo mkdir /dockerccache && sudo chown nbadoux:nbadoux /dockerccache 
 ENV VERSION=typepp
 
 FROM chromium_typepp_normal AS chromium_typepp
@@ -252,11 +252,11 @@ CMD ./build_chromium.sh typepp_checking_profiling && ./eval/eval.sh typepp_check
 
 # CHROMIUM + TYPEPP + CFI
 FROM chromium_typepp_start AS chromium_cfi_stats
-COPY --chown=${USERNAME}:${USERNAME} Type++/chromium/chromium-baseline /home/typeppUSER/chromium/
+COPY --chown=${USERNAME}:${USERNAME} Type++/chromium/chromium-baseline /home/nbadoux/chromium/
 RUN sudo /home/${USERNAME}/chromium/build/install-build-deps.sh
 COPY --chown=${USERNAME}:${USERNAME} ${CHROMIUM}/gclient_cfg ${TYPESAFETY_VTABLE}/chromium/gclient_cfg
 COPY --chown=${USERNAME}:${USERNAME} ${CHROMIUM}/get_deps.sh ${TYPESAFETY_VTABLE}/chromium/get_deps.sh
 WORKDIR ${TYPESAFETY_VTABLE}/chromium
 RUN ./get_deps.sh
-RUN sudo mkdir /dockerccache && sudo chown typeppUSER:typeppUSER /dockerccache 
+RUN sudo mkdir /dockerccache && sudo chown nbadoux:nbadoux /dockerccache 
 CMD ./build_chromium.sh cfi_stats && ./eval/eval.sh cfi_stats

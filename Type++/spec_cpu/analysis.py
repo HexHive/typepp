@@ -62,6 +62,7 @@ def choose_target(llvm_home):
         + " -mllvm -create-derived-cast-type-list"
         + " -mllvm -create-unrelated-cast-type-list"
         + " -mllvm -collect-profiling-data "
+        + " -mllvm -old-class-list "
         # + " -mllvm -check-unrelated-casting"
         # + " -mllvm -check-base-to-derived-casting"
         # + " -mllvm -apply-vtable-standard"

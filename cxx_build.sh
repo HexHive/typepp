@@ -1,6 +1,7 @@
 #!/bin/bash
 # shellcheck  disable=SC1091
 
+set -x
 set -e
 
 source "${ENVIRONMENT_FOLDER}/environment_patched.sh"
@@ -61,3 +62,5 @@ ninja
 ninja install
 cd ..
 python3 "${TYPESAFETY_FOLDER}/script/merge_typecasting_related_type.py" "$TYPEPLUS_LOG_PATH" > "$TARGET_TYPE_LIST_PATH"
+
+set +x

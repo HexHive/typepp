@@ -23,7 +23,7 @@ def launch_warning(original_clang_command):
     )
     original_clang_command = original_clang_command.replace(" -v ", " ")
     original_clang_command = original_clang_command.replace(
-        "CCACHE_SECONDARY_STORAGE=file:/mnt/sdb CCACHE_DEPEND=1 CCACHE_DIRECT=1 CCACHE_CPP2=1 CCACHE_SLOPPINESS=time_macros CCACHE_BASEDIR=/home/typeppUSER/ /usr/bin/ccache",
+        "CCACHE_SECONDARY_STORAGE=file:/mnt/sdb CCACHE_DEPEND=1 CCACHE_DIRECT=1 CCACHE_CPP2=1 CCACHE_SLOPPINESS=time_macros CCACHE_BASEDIR=/home/nbadoux/ /usr/bin/ccache",
         "",
     )
     original_clang_command = original_clang_command.replace("-mllvm -cast-obj-opt", "")
@@ -45,14 +45,14 @@ def launch_warning(original_clang_command):
         "-fno-split-dwarf-inlining", ""
     )
     original_clang_command = original_clang_command.replace(
-     "/home/typeppUSER/build/../libcxx-build-for-program/include", "/home/typeppUSER/build/include"
+     "/home/nbadoux/build/../libcxx-build-for-program/include", "/home/nbadoux/build/include"
     )
     original_clang_command = original_clang_command.replace(
-     "../../../libcxx-build-for-program/include", "/home/typeppUSER/build/include"
+     "../../../libcxx-build-for-program/include", "/home/nbadoux/build/include"
     )
 
     original_clang_command = original_clang_command.replace(
-        "/home/typeppUSER/build/bin/clang", typesafetyBUILD + "/bin/clang"
+        "/home/nbadoux/build/bin/clang", typesafetyBUILD + "/bin/clang"
     )
 
     original_clang_command = original_clang_command.replace(
@@ -62,7 +62,7 @@ def launch_warning(original_clang_command):
      "-fsanitize-cfi-canonical-jump-tables", ""
     )
     original_clang_command = original_clang_command.replace(
-    "-fsanitize-system-blacklist=/home/typeppUSER/build/lib/clang/13.0.0/share/cfi_blacklist.txt", ""
+    "-fsanitize-system-blacklist=/home/nbadoux/build/lib/clang/13.0.0/share/cfi_blacklist.txt", ""
     )
     if "../../../tools/gn/src" in original_clang_command:
         cwd = os.path.join(chromium_folder, "ui")

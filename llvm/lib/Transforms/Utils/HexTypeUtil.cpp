@@ -28,6 +28,21 @@ cl::opt<bool> ClCreateUnrelatedCastTypeList(
     cl::desc("create casting related object list"), cl::Hidden,
     llvm::cl::init(false));
 
+cl::opt<bool> ClOldClassList(
+    "old-class-list",
+    cl::desc("revert to old method of collecting classes, incomplete for unrelated cast"),
+    cl::Hidden, llvm::cl::init(false));
+
+cl::opt<bool> ClWrongPolymorphism(
+    "wrong-polymorphism",
+    cl::desc("SHOULD NOT BE USED, legacy version of setting polymorphism, incorrect"),
+    cl::Hidden, llvm::cl::init(false));
+
+cl::opt<bool> ClMissingChecks(
+    "missing-checks",
+    cl::desc("SHOULD NOT BE USED, legacy version of cast checking which was incomplete"),
+    cl::Hidden, llvm::cl::init(false));
+
 cl::opt<bool>
     ClPolyClasses("poly-classes",
                   llvm::cl::desc("force clases to be classes polymorphic"),

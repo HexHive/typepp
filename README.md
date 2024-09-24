@@ -56,7 +56,7 @@ the build process (especially the warning analysis).
 The following instructions have been tested on a fresh install of Ubuntu 20.04.
 We require at least 16GB of RAM for SPEC CPU benchmarks and 128GB of RAM if you
 want to build and run Chromium. 
-A folder, `typepp` will be created in your `$HOME` folder. 
+A folder, `LLVM-typepp` will be created in your `$HOME` folder. 
 
 ### Getting type++ code and inital requirements
 ```bash
@@ -65,14 +65,14 @@ cd ${HOME}
 export REPO=https://github.com/HexHive/typepp.git
 export BRANCH=typepp
 export DEPTH=100
-git clone $REPO --single-branch --branch $BRANCH --depth $DEPTH typepp
-cd ${HOME}/typepp
+git clone $REPO --single-branch --branch $BRANCH --depth $DEPTH LLVM-typepp
+cd ${HOME}/LLVM-typepp
 ```
 
 ### Requirements
 Install dependencies (Docker and a VNC server to run Chromium not in headless mode).
 ```bash
-cd ${HOME}/typepp
+cd ${HOME}/LLVM-typepp
 pip install -r requirements.txt
 
 # Chromium specific prerequisites: Install a vnc server
@@ -105,9 +105,9 @@ Retrieve the proprietary SPEC benchmarks.
 # Retrieve the SPEC benchmarks.
 
 # NOTE: I assume you have SPEC CPU 2006 and 2017 .iso in your home folder.
-# If it is not your case, make sure to copy the .iso into typepp folder
+# If it is not your case, make sure to copy the .iso into LLVM-typepp folder
 # before continuing 
-cd ${HOME}/typepp
+cd ${HOME}/LLVM-typepp
 mv ${HOME}/cpu2006-1.2.iso .
 mv ${HOME}/cpu2017-1.1.8.iso .
 ```
@@ -119,7 +119,7 @@ around *three* hours to build on a i7-8700 CPU @ 3.20GHz with
 6 physical cores.
 ```bash
 export DOCKER_BUILDKIT=1
-cd ${HOME}/typepp
+cd ${HOME}/LLVM-typepp
 docker build . --target typepp -t typepp
 ```
 
@@ -129,7 +129,7 @@ To ease the deployment of our evaluation, we created different Docker images wit
 ```bash
 # we build SPEC CPU 2006 and 2017 in three modes: reference, w/ LLVM-CFI, 
 # and w/ type++
-cd ${HOME}/typepp
+cd ${HOME}/LLVM-typepp
 docker build . --target cpu_reference -t cpu_reference
 docker build . --target cpu_cfi -t cpu_cfi
 docker build . --target cpu_typepp -t cpu_typepp
@@ -160,23 +160,23 @@ and 256GB of RAM).
 
 ```bash
 # We download our patched Chromium version
-cd ${HOME}/typepp
+cd ${HOME}/LLVM-typepp
 export DEPTH=100
 export CHROMIUM_REPO=https://github.com/vwvw/chromium
 export CHROMIUM_BRANCH_BASELINE=typepp
 export CHROMIUM_BRANCH_TYPEPP=typepp-partial-changes
-export CHROMIUM_FOLDER=${HOME}/typepp/Type++/chromium
+export CHROMIUM_FOLDER=${HOME}/LLVM-typepp/Type++/chromium
 git clone $CHROMIUM_REPO --single-branch --branch $CHROMIUM_BRANCH_BASELINE ${CHROMIUM_FOLDER}/chromium-baseline --depth $DEPTH
 git clone $CHROMIUM_REPO --single-branch --branch $CHROMIUM_BRANCH_TYPEPP ${CHROMIUM_FOLDER}/chromium-typepp --depth $DEPTH
 
 # we build five versions of Chromium: baseline, cfi, typepp, cfi+statistics, and typepp+statistics
 # /!\ THIS WILL TAKE AROUND 400GB OF DISK SPACE AND MORE THAN A DAY TO BUILD
-chmod 777 -R ${HOME}/typepp/Type++/chromium/eval
-${HOME}/typepp/Type++/chromium/build_baseline.sh
-${HOME}/typepp/Type++/chromium/build_cfi.sh
-${HOME}/typepp/Type++/chromium/build_typepp.sh
-${HOME}/typepp/Type++/chromium/build_cfi_stats.sh
-${HOME}/typepp/Type++/chromium/build_typepp_stats.sh
+chmod 777 -R ${HOME}/LLVM-typepp/Type++/chromium/eval
+${HOME}/LLVM-typepp/Type++/chromium/build_baseline.sh
+${HOME}/LLVM-typepp/Type++/chromium/build_cfi.sh
+${HOME}/LLVM-typepp/Type++/chromium/build_typepp.sh
+${HOME}/LLVM-typepp/Type++/chromium/build_cfi_stats.sh
+${HOME}/LLVM-typepp/Type++/chromium/build_typepp_stats.sh
 ```
 
 You should now have all the necessary images to run the full evaluation. Please proceed to the [Evaluation](#evaluation) section.
@@ -188,9 +188,9 @@ operate in a **tumx** session to avoid losing partial results or environment
 settings.
 
 **Disclaimer2:** we also assume the repository is cloned into the `HOME` folder as per [installation](#build-from-source).
-Therefore, all the commands are assumed to be launched from `${HOME}/typepp`.
+Therefore, all the commands are assumed to be launched from `${HOME}/LLVM-typepp`.
 ```bash
-cd ${HOME}/typepp
+cd ${HOME}/LLVM-typepp
 ```
 
 ### Running SPEC (Table I & II)
@@ -207,24 +207,24 @@ The number of repetition is controlled by the `NUMBER_OF_ITERATION` variable.
 export NUMBER_OF_REPLICATION=1 
 export DOCKER_BUILDKIT=1 
 
-cd ${HOME}/typepp
+cd ${HOME}/LLVM-typepp
 mkdir -p results
 # run the experiment
 docker run --env NUMBER_OF_ITERATION=$NUMBER_OF_REPLICATION --name cpu_reference_container -t cpu_reference
 # collect the results
-docker container cp  cpu_reference_container:/home/typeppUSER/results results_baseline
+docker container cp  cpu_reference_container:/home/nbadoux/results results_baseline
 cat results_baseline/runtime_performance.csv >> ./results/runtime_performance.csv
 
 # run the experiment
 docker run --env NUMBER_OF_ITERATION=$NUMBER_OF_REPLICATION --name cpu_cfi_container -t cpu_cfi 
 # collect the results
-docker container cp  cpu_cfi_container:/home/typeppUSER/results results_cfi
+docker container cp  cpu_cfi_container:/home/nbadoux/results results_cfi
 cat results_cfi/runtime_performance.csv >> ./results/runtime_performance.csv
 
 # run the experiment
 docker run --env NUMBER_OF_ITERATION=$NUMBER_OF_REPLICATION --name cpu_typepp_container -t cpu_typepp 
 # collect the results
-docker container cp  cpu_typepp_container:/home/typeppUSER/results results_typepp
+docker container cp  cpu_typepp_container:/home/nbadoux/results results_typepp
 cat results_typepp/runtime_performance.csv >> ./results/runtime_performance.csv
 ```  
 #### Type confusions coverage runs
@@ -234,17 +234,17 @@ Since SPEC CPU is deterministic, one run is sufficient.
 ```bash
 export DOCKER_BUILDKIT=1 
 
-cd ${HOME}/typepp
+cd ${HOME}/LLVM-typepp
 # run the experiment
 docker run --env NUMBER_OF_ITERATION=1 --name cpu_cfi_stats_container -t cpu_cfi_stats 
 # collect the results
-docker container cp  cpu_cfi_stats_container:/home/typeppUSER/results results_cfi_stats
+docker container cp  cpu_cfi_stats_container:/home/nbadoux/results results_cfi_stats
 cp results_cfi_stats/total_result* results
 
 # run the experiment
 docker run --env NUMBER_OF_ITERATION=1 --name cpu_typepp_stats_container -t cpu_typepp_stats 
 # collect the results
-docker container cp  cpu_typepp_stats_container:/home/typeppUSER/results results_typepp_stats
+docker container cp  cpu_typepp_stats_container:/home/nbadoux/results results_typepp_stats
 cp results_typepp_stats/total_result* results
 ```  
 #### Memory runs
@@ -255,27 +255,27 @@ The number of repetition is controlled by the `NUMBER_OF_ITERATION` variable.
 export NUMBER_OF_REPLICATION=1
 export DOCKER_BUILDKIT=1 
 
-cd ${HOME}/typepp
+cd ${HOME}/LLVM-typepp
 # run the experiment
 docker run --env NUMBER_OF_ITERATION=${NUMBER_OF_REPLICATION} --name memory_reference_container -t memory_reference
 # collect the results
-docker container cp  memory_reference_container:/home/typeppUSER/results results_baseline_memory
+docker container cp  memory_reference_container:/home/nbadoux/results results_baseline_memory
 cp results_baseline_memory/total_result_memory_baseline_* ./results/
 
 # run the experiment
 docker run --env NUMBER_OF_ITERATION=${NUMBER_OF_REPLICATION} --name memory_typepp_container -t memory_typepp 
 # collect the results
-docker container cp  memory_typepp_container:/home/typeppUSER/results results_typepp_memory
+docker container cp  memory_typepp_container:/home/nbadoux/results results_typepp_memory
 cp results_typepp_memory/total_result_memory_vtype_* ./results/
 ```
 #### Warnings runs
 The warning analysis needs only one repetition.
 ```bash
-cd ${HOME}/typepp
+cd ${HOME}/LLVM-typepp
 # run the experiment
 docker run --env NUMBER_OF_ITERATION=1 --name cpu_typepp_analysis_container -t cpu_typepp_analysis 
 # collect the results
-docker cp cpu_typepp_analysis_container:/home/typeppUSER/results/ results_typepp_analysis
+docker cp cpu_typepp_analysis_container:/home/nbadoux/results/ results_typepp_analysis
 ```  
 
 ### Table I: Warning Analysis
@@ -283,7 +283,7 @@ docker cp cpu_typepp_analysis_container:/home/typeppUSER/results/ results_typepp
 The table containst the resutls from the warning analysis. We further provide the patches for [SPEC CPU](./Type++/spec_cpu/patch).
 
 ```bash
-cd ${HOME}/typepp
+cd ${HOME}/LLVM-typepp
 cat ./results_typepp_analysis/analysis_result_test.tex
 ```
 
@@ -294,7 +294,7 @@ coverage. The raw logs are stored in the `results` folder. Run the following
 command to reproduce Table I from our paper. 
 
 ```bash
-cd ${HOME}/typepp
+cd ${HOME}/LLVM-typepp
 export RESULT_FOLDER=./results
 ./Type++/script/getmemoryoverhead.py &&  ./Type++/script/getperformanceresult.py
 ```
@@ -312,18 +312,18 @@ Chromium. The last line reports the results in a table.
 As the run is non-deterministic, there might be some variance in the results. 
 
 ```bash
-cd ${HOME}/typepp
-chmod 777 -R ${HOME}/typepp/Type++/chromium/eval
+cd ${HOME}/LLVM-typepp
+chmod 777 -R ${HOME}/LLVM-typepp/Type++/chromium/eval
 mkdir -p results
 
-${HOME}/typepp/Type++/chromium/run_baseline.sh
-${HOME}/typepp/Type++/chromium/run_cfi.sh
-${HOME}/typepp/Type++/chromium/run_typepp.sh
-${HOME}/typepp/Type++/chromium/run_cfi_stats.sh
-${HOME}/typepp/Type++/chromium/run_typepp_stats.sh
+${HOME}/LLVM-typepp/Type++/chromium/run_baseline.sh
+${HOME}/LLVM-typepp/Type++/chromium/run_cfi.sh
+${HOME}/LLVM-typepp/Type++/chromium/run_typepp.sh
+${HOME}/LLVM-typepp/Type++/chromium/run_cfi_stats.sh
+${HOME}/LLVM-typepp/Type++/chromium/run_typepp_stats.sh
 
 export RESULT_FOLDER=./results
-${HOME}/typepp/Type++/chromium/gettable.py
+${HOME}/LLVM-typepp/Type++/chromium/gettable.py
 
 ```
 
@@ -338,7 +338,7 @@ docker build . --target typepp -t typepp
 docker run -it typepp zsh
 ```
 
-Once inside the Docker container, you will find the Clang binary in `/home/typeppUSER/build/bin/clang++`.
+Once inside the Docker container, you will find the Clang binary in `/home/nbadoux/build/bin/clang++`.
 
 A guide to the different options of type++ can be found in the [Type++](./Type++/README.md#usage) folder.
 

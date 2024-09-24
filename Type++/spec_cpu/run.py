@@ -91,6 +91,8 @@ def choose_target(target, mode=None):
             additional_CXXOPTIMIZE += (
                 " -mllvm -create-derived-cast-type-list"
                 + " -mllvm -create-unrelated-cast-type-list"
+                + " -mllvm -old-class-list "
+                + " -mllvm -wrong-polymorphism "
             )
 
         elif mode == "optimize":
@@ -100,6 +102,9 @@ def choose_target(target, mode=None):
                 + " -mllvm -apply-vtable-standard"
                 + " -mllvm -poly-classes "
                 + " -mllvm -cast-obj-opt "
+                + " -mllvm -old-class-list "
+                + " -mllvm -missing-checks "
+                + " -mllvm -wrong-polymorphism "
             )
     else:
         my_logger.error("Unsupported run configuration. Target: %s, version: %s", target, mode)
@@ -627,7 +632,7 @@ if args.stats:
     elif args.target == "cfi":
         CXXOPTIMIZE += (
             " -fsanitize=typeplus "
-            + " -mllvm -collect-profiling-data "
+            + " -mllvm -collect-profiling-data -mllvm -missing-checks "
         )
 
     else:
@@ -699,7 +704,7 @@ for PROGRAM in programs:
         start = time.time()
         lib_build_out = subprocess.check_output([os.path.join(llvm_home, "cxx_build_for_program.sh")] + ["debug" if args.clang_debug else ""], env=env)
         libc_duration = time.time() - start
-        #print(lib_build_out.decode("utf-8"))
+        print(lib_build_out.decode("utf-8"))
         start = time.time()
     except subprocess.CalledProcessError as ce:
         print(ce.output.decode("utf-8"), end="")

@@ -11,7 +11,7 @@ cmake -GNinja -DLLVM_PATH="${LLVM_FOLDER}/llvm" \
  -DCMAKE_BUILD_TYPE=Release \
  -DCMAKE_CXX_COMPILER="${BUILD_DIR}/bin/clang++" \
  -DCMAKE_C_COMPILER="${BUILD_DIR}/bin/clang" \
- -DCMAKE_CXX_FLAGS="-O3 -fsanitize=typeplus -mllvm -create-derived-cast-type-list -mllvm -create-unrelated-cast-type-list -mllvm -collect-profiling-data -flto -fvisibility=hidden " \
+ -DCMAKE_CXX_FLAGS="-O3 -fsanitize=typeplus -mllvm -create-derived-cast-type-list -mllvm -create-unrelated-cast-type-list -mllvm -collect-profiling-data -flto -fvisibility=hidden -mllvm -old-class-list " \
  -DCMAKE_C_FLAGS="-O3" \
  -DCMAKE_INSTALL_PREFIX="${BUILD_DIR}" \
  -DLIBCXX_CXX_ABI_INCLUDE_PATHS="${LLVM_FOLDER}/libcxxabi/include" \

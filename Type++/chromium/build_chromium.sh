@@ -35,7 +35,7 @@ export LDFLAGS+="  -flto -fvisibility=hidden "
 if [[ $1 == ref* ]] ; then
     export VERSION=ref
     export CCACHE_RECACHE=true
-    cd /home/typeppUSER/chromium
+    cd /home/nbadoux/chromium
     git checkout typepp --
     git reset --hard typepp 
 fi
@@ -49,17 +49,19 @@ if [[ $1 == cfi* ]] ; then
     -fno-sanitize-trap=cfi-derived-cast,cfi-unrelated-cast \
     -fsanitize-recover=cfi-derived-cast,cfi-unrelated-cast \
     -fsanitize=cfi-derived-cast,cfi-unrelated-cast "
-    cd /home/typeppUSER/chromium
+    cd /home/nbadoux/chromium
     if [[ $1 == cfi_stats* ]] ; then
         export VERSION=cfi_stats
-        export CXXFLAGS+=" -fsanitize=typeplus -mllvm -collect-profiling-data "
-        export LDFLAGS+="  -fsanitize=typeplus -mllvm -collect-profiling-data "
+        export CXXFLAGS+=" -fsanitize=typeplus -mllvm -collect-profiling-data \
+                           -mllvm -wrong-polymorphism \
+               -mllvm -missing-checks "
+        export LDFLAGS+="  -fsanitize=typeplus -mllvm -collect-profiling-data -mllvm -missing-checks "
     fi
     git checkout typepp --
     git reset --hard typepp 
 fi
 if [[ $# -eq 0 || $1 == typepp* ]] ; then
-    cd /home/typeppUSER/chromium
+    cd /home/nbadoux/chromium
     #rm -drf $TYPEPLUS_LOG_PATH
     mkdir -p $TYPEPLUS_LOG_PATH
     touch $TARGET_TYPE_LIST_PATH
@@ -83,7 +85,10 @@ if [[ $# -eq 0 || $1 == typepp* ]] ; then
         export CXXFLAGS+=" -mllvm -cast-obj-opt  \
                            -mllvm -apply-vtable-standard \
                            -mllvm -poly-classes \
+                           -mllvm -wrong-polymorphism \
+                           -mllvm -missing-checks \
                            -mllvm -no-check-unsupported-class \
+                           -mllvm -old-class-list "
     fi
     if [[ $1 == typepp_warning* ]] ; then
         export VERSION=typepp_warning
@@ -114,10 +119,10 @@ ${TYPESAFETY_FOLDER}/chromium/get_deps.sh
 cd -
 
 if [[ $# -eq 0 || ( $1 == typepp* && $1 != typepp_collect ) ]] ; then
-    cd /home/typeppUSER/chromium/third_party
+    cd /home/nbadoux/chromium/third_party
     patch -f -p1 < ${TYPESAFETY_FOLDER}/chromium/patch/third_party.patch
     cd -
-    cd /home/typeppUSER/chromium/v8 
+    cd /home/nbadoux/chromium/v8 
     patch -f -p1 < ${TYPESAFETY_FOLDER}/chromium/patch/v8.patch
     cd -
 fi
@@ -309,7 +314,7 @@ export LDFLAGS+=" -Wl,-rpath,${TYPEPLUS_LOG_PATH}/libcxxabi-build${FOR_PROGRAM}/
 									-L${TYPEPLUS_LOG_PATH}/libcxx-build${FOR_PROGRAM}/lib \
 									-stdlib=libc++ -lc++ "
 if [[ $# -eq 0 || $1 == typepp*  || $1 == cfi* ]] ; then
-    export LDFLAGS+=" -fsanitize=typeplus -Wl,--rpath,/home/typeppUSER/build/lib/clang/13.0.0/lib/linux/ -L/home/typeppUSER/build/lib/clang/13.0.0/lib/linux/ -l:libclang_rt.ubsan_standalone_cxx-x86_64.a -l:libclang_rt.ubsan_standalone-x86_64.a -l:libclang_rt.typeplus-x86_64.a "
+    export LDFLAGS+=" -fsanitize=typeplus -Wl,--rpath,/home/nbadoux/build/lib/clang/13.0.0/lib/linux/ -L/home/nbadoux/build/lib/clang/13.0.0/lib/linux/ -l:libclang_rt.ubsan_standalone_cxx-x86_64.a -l:libclang_rt.ubsan_standalone-x86_64.a -l:libclang_rt.typeplus-x86_64.a "
 fi
 
 rm -drf ${CHROMIUM_FOLDER}/out/${VERSION}

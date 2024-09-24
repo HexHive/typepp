@@ -1135,6 +1135,7 @@ Address CodeGenFunction::EmitPointerWithAlignment(const Expr *E,
             exit(1);
           }
           QualType SrcTy= CE->getSubExpr()->getType();
+          if(llvm::ClOldClassList) {
             llvm::HexTypeCommonUtil HexTypeCommonUtilSet;
             QualType DestTy = E->getType();
             if(DestTy->getPointeeCXXRecordDecl()) {
@@ -1157,6 +1158,10 @@ Address CodeGenFunction::EmitPointerWithAlignment(const Expr *E,
                 HexTypeCommonUtilSet.updateCastingRelatedTypeIntoFile(ConvertType(DestTy));
               }
             }
+          } else {
+            CGM.getTypes().updateCastingRelatedTypeIntoFile1(SrcTy, false);
+            CGM.getTypes().updateCastingRelatedTypeIntoFile2(SrcTy, false);
+          }
         }
 
 
@@ -4789,6 +4794,7 @@ LValue CodeGenFunction::EmitCastLValue(const CastExpr *E) {
         exit(1);
       }
       QualType SrcTy = E->getType();
+      if(llvm::ClOldClassList) {
         if (!SrcTy->isVoidPointerType() && SrcTy->isAnyPointerType() &&
              SrcTy->getPointeeType()->isStructureOrClassType() &&
              SrcTy->getPointeeType()->getAsCXXRecordDecl()->isCompleteDefinition() &&
@@ -4796,6 +4802,10 @@ LValue CodeGenFunction::EmitCastLValue(const CastExpr *E) {
           llvm::HexTypeCommonUtil HexTypeCommonUtilSet;
           HexTypeCommonUtilSet.updateCastingRelatedTypeIntoFile(ConvertType(SrcTy));
         }
+      } else {
+        CGM.getTypes().updateCastingRelatedTypeIntoFile1(SrcTy, true);
+        CGM.getTypes().updateCastingRelatedTypeIntoFile2(SrcTy, true);
+      }
     }
 
     return MakeAddrLValue(Derived, E->getType(), LV.getBaseInfo(),
@@ -4819,6 +4829,7 @@ LValue CodeGenFunction::EmitCastLValue(const CastExpr *E) {
         llvm::errs() << "The option \"cast-obj-opt\" and \"create-cast-..._list\" cannot but used at the same time.\n";
         exit(1);
       }
+      if(llvm::ClOldClassList) {
         llvm::HexTypeCommonUtil HexTypeCommonUtilSet;
         if (const CXXRecordDecl *SourceClassDecl = SrcTy->getPointeeCXXRecordDecl()) {
           for (const auto &Base : SourceClassDecl->bases()) {
@@ -4828,6 +4839,7 @@ LValue CodeGenFunction::EmitCastLValue(const CastExpr *E) {
             }
           }
         }
+        // TODO: NICOLAS CHECK IF this should not be in the if
         if (!SrcTy->isVoidPointerType() && SrcTy->isAnyPointerType() &&
              SrcTy->getPointeeType()->isStructureOrClassType() &&
              SrcTy->getPointeeType()->getAsCXXRecordDecl()->isCompleteDefinition() &&
@@ -4835,6 +4847,10 @@ LValue CodeGenFunction::EmitCastLValue(const CastExpr *E) {
           HexTypeCommonUtilSet.updateCastingRelatedTypeIntoFile(
                 ConvertType(SrcTy));
         }
+      } else {
+        CGM.getTypes().updateCastingRelatedTypeIntoFile1(SrcTy, isDerivedCast);
+        CGM.getTypes().updateCastingRelatedTypeIntoFile2(SrcTy, isDerivedCast);
+      }
     }
 
     if (SanOpts.has(SanitizerKind::CFIUnrelatedCast) && (SanOpts.has(SanitizerKind::TypePlus) && llvm::ClTypePlusCheckUnrelatedCasting)) {

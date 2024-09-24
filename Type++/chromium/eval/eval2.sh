@@ -30,9 +30,9 @@ RUNS=1
 for I in $(seq 1 $RUNS)
 do
     echo $I
-    rm -drf /home/typeppUSER/Downloads/JetStream*
+    rm -drf /home/nbadoux/Downloads/JetStream*
 
-    /home/typeppUSER/chromium/out/${VERSION}/chrome browserbench.org/JetStream --no-sandbox --single-process --disable-gpu --no-first-run --enable-field-trial-config --enable-benchmarking &
+    /home/nbadoux/chromium/out/${VERSION}/chrome browserbench.org/JetStream --no-sandbox --single-process --disable-gpu --no-first-run --enable-field-trial-config --enable-benchmarking &
     CHROME_PID=$!
     sleep 25
     xdotool key Return 
@@ -46,6 +46,6 @@ do
     xdotool key Return
     sleep 1
     kill -2 $CHROME_PID
-    cp "/home/typeppUSER/Downloads/JetStream 2.1.html" ${TYPESAFETY_CHROMIUM_EVAL_FOLDER}/${VERSION}_${I}.html
+    cp "/home/nbadoux/Downloads/JetStream 2.1.html" ${TYPESAFETY_CHROMIUM_EVAL_FOLDER}/${VERSION}_${I}.html
 done
 # grep -oP '(?<=score">).*(?=</div><label>Score)' *.html

@@ -1,4 +1,4 @@
-CXX=/home/typeppUSER/build/bin/clang++
+CXX=/home/nbadoux/build/bin/clang++
 CXXFLAGS=-std=c++14 -Wall -Wextra -Werror -Wno-unused-parameter -Wno-error -pedantic -O2 -g -fsanitize=cfi-derived-cast -fsanitize=cfi-unrelated-cast -flto -fvisibility=hidden -Wno-unused-value
 
 all: benchmark

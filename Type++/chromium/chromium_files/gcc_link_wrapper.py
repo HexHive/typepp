@@ -58,7 +58,7 @@ def main():
   fast_env = dict(os.environ)
   fast_env['LC_ALL'] = 'C'
   #print(args.command)
-  args.command += ["/home/typeppUSER/typepp/build/lib/clang/13.0.0/lib/linux/libclang_rt.typeplus-x86_64.a"]
+  args.command += ["/home/nbadoux/LLVM-typepp/build/lib/clang/13.0.0/lib/linux/libclang_rt.typeplus-x86_64.a"]
   result = wrapper_utils.RunLinkWithOptionalMapFile(args.command, env=fast_env,
                                                     map_file=args.map_file)
   if result != 0:

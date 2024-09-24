@@ -17,6 +17,9 @@ namespace llvm {
 
 extern cl::opt<bool> ClCreateUnrelatedCastTypeList;
 extern cl::opt<bool> ClCreateDerivedCastTypeList;
+extern cl::opt<bool> ClOldClassList;
+extern cl::opt<bool> ClWrongPolymorphism;
+extern cl::opt<bool> ClMissingChecks;
 extern cl::opt<bool> ClCastObjOpt;
 extern cl::opt<bool> ClNoCheckUnsuppClass;
 extern cl::opt<bool> ClPolyClasses;

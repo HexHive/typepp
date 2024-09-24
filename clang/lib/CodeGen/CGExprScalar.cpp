@@ -2520,6 +2520,7 @@ Value *ScalarExprEmitter::VisitCastExpr(CastExpr *CE) {
           break;
         testType = test;
       }
+      if(llvm::ClOldClassList) {
                   llvm::HexTypeCommonUtil HexTypeCommonUtilSet;
         if (const CXXRecordDecl *DerivedClassDecl = testType->getPointeeCXXRecordDecl()) {
            if (DerivedClassDecl->hasDefinition()) {
@@ -2540,6 +2541,20 @@ Value *ScalarExprEmitter::VisitCastExpr(CastExpr *CE) {
 
           }
         }
+
+      } else {
+        if(!CastSrcTy->isVoidPointerType() && DestTy->isVoidPointerType() && CastSrcTy->isAnyPointerType() && CastSrcTy->getPointeeType()->isStructureOrClassType()) {
+          llvm::HexTypeCommonUtil::logClassToFile(ConvertType(CastSrcTy), "/cast_to_void");
+        } else if(CastSrcTy->isVoidPointerType() && !DestTy->isVoidPointerType() && DestTy->isAnyPointerType() && DestTy->getPointeeType()->isStructureOrClassType()) {
+          llvm::HexTypeCommonUtil::logClassToFile(ConvertType(DestTy), "/cast_from_void");
+        } 
+      
+        CGF.CGM.getTypes().updateCastingRelatedTypeIntoFile1(CastSrcTy, isDerivedCast);
+        CGF.CGM.getTypes().updateCastingRelatedTypeIntoFile2(CastSrcTy, isDerivedCast);
+        if (!isNotVoidCast) {
+          CGF.CGM.getTypes().updateCastingRelatedTypeIntoFile2(DestTy, isDerivedCast);
+        }
+      }
     }
 
     // Check should come after adding constructor as otherwise the vtable will not be init
@@ -2594,6 +2609,7 @@ Value *ScalarExprEmitter::VisitCastExpr(CastExpr *CE) {
         exit(1);
       }
       QualType SrcTy = E->getType();
+      if(llvm::ClOldClassList) {
                   llvm::HexTypeCommonUtil HexTypeCommonUtilSet;
         if (!SrcTy->isVoidPointerType() && SrcTy->isAnyPointerType() &&
              SrcTy->getPointeeType()->isStructureOrClassType() &&
@@ -2604,6 +2620,9 @@ Value *ScalarExprEmitter::VisitCastExpr(CastExpr *CE) {
           HexTypeCommonUtilSet.updateCastingRelatedTypeIntoFile(
                 ConvertType(DestTy));
         }
+      } else {
+        CGF.CGM.getTypes().updateCastingRelatedTypeIntoFile2(SrcTy, true);
+      }
     }
 
     // C++11 [expr.static.cast]p11: Behavior is undefined if a downcast is

@@ -13,7 +13,7 @@ The LLVM code is released under the Apache License v2.0 with LLVM Exceptions. Th
 ### Docker container
 ```bash
 export DOCKER_BUILDKIT=1
-cd ${HOME}/typepp
+cd ${HOME}/LLVM-typepp
 docker build . --target typepp -t typepp
 docker run -it typepp --name typepp_container zsh
 ```
@@ -23,11 +23,11 @@ docker run -it typepp --name typepp_container zsh
 First run the init script to install `dockerx` and allow VNC into the Docker
 container. The script will also build the Docker images. 
 ```bash
-cd typepp/type++
+cd LLVM-typepp/type++
 ./container_init.sh
 ```
 
-Once this is done, open the folder `typepp` in a new Visual Studio Code
+Once this is done, open the folder `LLVM-typepp` in a new Visual Studio Code
 window. A prompt should suggest you to either install the dev container
 extension or to launch let Visual Studio launch the container. Click `Reopen in
 Container`.
@@ -43,7 +43,7 @@ sudo apt-get install -qq -y git clang \
 	vim python3-distutils ccache zip \
 	python3-dotenv python3 make  python texinfo bison p7zip-full p7zip-rar \
   devscripts libmpc-dev python3-pip
-cd typepp/type++
+cd LLVM-typepp/type++
 pip3 install -r requirements.txt
 
 cd ..
